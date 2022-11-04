@@ -9,12 +9,26 @@ use wasmedge_wasi_socket::{Shutdown, TcpListener, TcpStream};
 
 fn main() -> std::io::Result<()> {
     let port = std::env::var("PORT").unwrap_or(String::from("8080")).parse::<u16>().unwrap();
-    println!("Going to bind to port {port}");
 
-    let listener = TcpListener::bind(("0.0.0.0", port), true).unwrap();
+    println!("Going to bind to port {port}");
+    let listener = match TcpListener::bind(("0.0.0.0", port), false) {
+        Ok(listener) => listener,
+        Err(e) => {
+            panic!("{:?}", e);
+        }
+    };
+    println!("Bound to port {port}");
 
     loop {
-        let _ = handle_client(listener.accept(true)?.0);
+        let stream = match listener.accept(false) {
+            Ok((stream, _)) => stream,
+            Err(e) => {
+                panic!("{:?}", e);
+            }
+        };
+        println!("Accepted client");
+
+        let _ = handle_client(stream);
     }
 }
 
