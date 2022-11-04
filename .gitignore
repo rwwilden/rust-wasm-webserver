@@ -1,0 +1,4 @@
+/target
+/rust_wasm_webserver.cwasm
+/rust_wasm_webserver.wasm
+/.idea/
